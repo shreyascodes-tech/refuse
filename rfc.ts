@@ -70,7 +70,7 @@ if (args[0] === "gen") {
     "routes/layout.tsx",
     `import { h } from "refuse";
 
-    const Layout: React.FC = ({ children }) => {
+    export default function Layout({ children }) {
       return (
         <html>
           <head>
@@ -80,8 +80,6 @@ if (args[0] === "gen") {
         </html>
       );
     };
-    //
-    export default Layout;
     `
   );
   console.info("Creating index route");
@@ -92,7 +90,7 @@ if (args[0] === "gen") {
     export default function Index() {
       return (
         <main>
-        <h1>Home Page</h1>
+          <h1>Home Page</h1>
         </main>
         );
       }
