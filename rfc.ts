@@ -86,7 +86,7 @@ if (args[0] === "gen") {
   );
   console.info("Creating index route");
   await Deno.writeTextFile(
-    "routes/index.ts",
+    "routes/index.tsx",
     `import { h } from "refuse";
     
     export default function Index() {
@@ -99,5 +99,7 @@ if (args[0] === "gen") {
       `
   );
   console.info("Generating router.ts");
+  console.info("Init successful\n\n\n");
+  console.info("Run `rfc dev` to start the dev server");
   await generateRouteMap();
 }
