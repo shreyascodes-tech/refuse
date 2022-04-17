@@ -63,6 +63,7 @@ if (args[0] === "gen") {
     });
     `
   );
+  await Deno.create("./routes/");
   console.info("Creating root layout");
   await Deno.writeTextFile(
     "routes/layout.tsx",
