@@ -4,24 +4,10 @@ const dirEr = (base: string) => (path: string) => base + "/" + path;
 
 export const initCommand = async (dir: string) => {
   console.log("✨ Scaffolding the project...");
-  if (dir === ".") {
-    return;
-  }
 
   await Deno.mkdir(dir);
 
   const d = dirEr(dir);
-  //   console.info("Writing deno.json");
-  //   await Deno.writeTextFile(
-  //     d("deno.json"),
-  //     `{
-  //       "importMap": "import_map.json",
-  //       "compilerOptions": {
-  //         "jsxFactory": "h"
-  //       }
-  //     }
-  //     `
-  //   );
   console.info("📝 Writing refuse.ts");
   await Deno.writeTextFile(d("refuse.ts"), `export * from "${REFUSE_URL}";`);
   console.info("📝 Writing main.ts");
