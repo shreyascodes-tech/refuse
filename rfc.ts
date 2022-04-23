@@ -1,103 +1,34 @@
-import { generateRouteMap } from "./route_map_gen.ts";
-import { devServer } from "./dev.ts";
+import { Command } from "https://deno.land/x/cliffy@v0.23.0/command/mod.ts";
 
-const args = Deno.args;
-if (args[0] === "gen") {
-  const toGen = args[1];
+import { REFUSE_VERSION } from "./commands/constants.ts";
+import { initCommand } from "./commands/init.ts";
+import { genCommand } from "./commands/gen.ts";
+import { devCommand } from "./commands/dev.ts";
+import { startCommand } from "./commands/start.ts";
 
-  if (toGen === "router") {
-    console.log("Generating router");
-    await generateRouteMap();
-    console.log("Written to router.ts");
-  }
-} else if (args[0] === "dev") {
-  console.log("Launching dev server");
-  await devServer();
-} else if (args[0] === "start") {
-  console.log("Generating router");
-  await generateRouteMap();
-  console.log("Written to router.ts");
-  console.log("Launching server");
-  Deno.run({
-    cmd: ["deno", "run", "--allow-net", "--allow-read", "main.ts"],
-    stdin: "inherit",
-    stderr: "inherit",
-    stdout: "inherit",
-  });
-  while (true);
-} else if (args[0] === "init") {
-  console.log("Scaffolding the app");
-  console.info("Writing deno.json");
-  await Deno.writeTextFile(
-    "deno.json",
-    `{
-      "importMap": "import_map.json",
-      "compilerOptions": {
-        "jsxFactory": "h"
-      }
-    }
-    `
-  );
-  console.info("Writing import_map.json");
-  await Deno.writeTextFile(
-    "import_map.json",
-    `{
-      "imports": {
-        "react": "https://esm.sh/react",
-        "refuse": "https://raw.githubusercontent.com/shreyassanthu77/refuse/main/refuse.ts"
-      }
-    }`
-  );
-  console.info("Writing main.ts");
-  await Deno.writeTextFile(
-    "main.ts",
-    `import { runApp } from "refuse";
-    import { routes } from "./router.ts";
-    
-    const dev = Deno.args[0] === "dev";
-    
-    await runApp({
-      port: dev ? 3000 : 80,
-      routes,
-      dev,
-    });
-    `
-  );
-  console.info("Creating Routes directory");
-  await Deno.mkdir("routes");
-  console.info("Creating root layout");
-  await Deno.writeTextFile(
-    "routes/layout.tsx",
-    `import { h } from "refuse";
-
-    export default function Layout({ children }) {
-      return (
-        <html>
-          <head>
-            <title>Refuse</title>
-          </head>
-          <body>{children}</body>
-        </html>
-      );
-    };
-    `
-  );
-  console.info("Creating index route");
-  await Deno.writeTextFile(
-    "routes/index.tsx",
-    `import { h } from "refuse";
-    
-    export default function Index() {
-      return (
-        <main>
-          <h1>Home Page</h1>
-        </main>
-        );
-      }
-      `
-  );
-  console.info("Generating router.ts");
-  console.info("Init successful\n\n\n");
-  console.info("Run `rfc dev` to start the dev server");
-  await generateRouteMap();
-}
+await new Command()
+  .name("Refuse CLI")
+  .version(REFUSE_VERSION)
+  .description("A CLI tool to work with refuse projects")
+  // Init command
+  .command("init", "Scaffolds a new Refuse project")
+  .arguments("[dir:string]")
+  .action(async (_, ...args) => {
+    const [dir = "."] = args;
+    console.log({ dir });
+    await initCommand(dir);
+  })
+  // Dev command
+  .command("dev", "Run the project in development mode")
+  .action(devCommand)
+  // Start command
+  .command("start", "Run the project in production mode")
+  .alias("run")
+  .alias("serve")
+  .alias("server")
+  .action(startCommand)
+  // Generate command
+  .command("generate", genCommand)
+  .alias("gen")
+  .alias("g")
+  .parse(Deno.args);
