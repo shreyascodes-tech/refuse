@@ -1,11 +1,19 @@
 import { REFUSE_URL } from "./constants.ts";
+import { exists } from "https://deno.land/std@0.135.0/fs/mod.ts";
+
+const mkdir = async (path: string) => {
+  if (!(await exists(path))) {
+    return Deno.mkdir(path);
+  }
+};
 
 const dirEr = (base: string) => (path: string) => base + "/" + path;
 
 export const initCommand = async (dir: string) => {
   console.log("✨ Scaffolding the project...");
-
-  await Deno.mkdir(dir);
+  if (dir !== ".") {
+    await mkdir(dir);
+  }
 
   const d = dirEr(dir);
   console.info("📝 Writing refuse.ts");
@@ -26,7 +34,7 @@ await runApp({
 `
   );
   console.info("📁 Creating Routes directory");
-  await Deno.mkdir(d("routes"));
+  await mkdir(d("routes"));
   console.info("📝 Creating root layout");
   await Deno.writeTextFile(
     d("routes/layout.tsx"),
